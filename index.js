@@ -39,7 +39,6 @@ module.exports = class API {
         "sourceScheme": "Secure",
         "sourcePort": 443
       };
-      if (/^__Secure-/.test(name))
       cookie = attributes.split(/\s*;\s*/).reduce((acc, str) => {
         let [_, k, v] = str.match(/([^=]*)(?:=(.*))?/)
         switch (k.toLowerCase()) {
