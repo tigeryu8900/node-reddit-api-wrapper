@@ -392,7 +392,7 @@ module.exports = class API {
   }
 
   static fromFile(file) {
-    return new API(JSON.stringify(fs.readFileSync(file)));
+    return new API(JSON.parse(fs.readFileSync(file)));
   }
 
   static async fromCredentials(username, password, keepalive=false) {
