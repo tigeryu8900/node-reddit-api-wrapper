@@ -103,19 +103,23 @@ module.exports = class API {
     }
 
     async read() {
-      return this.#api.read_message(this.data.name);
+      return this.#api.read_message(this?.data?.name);
     }
 
     async unread() {
-      return this.#api.unread_message(this.data.name);
+      return this.#api.unread_message(this?.data?.name);
     }
 
     async collapse() {
-      return this.#api.collapse_message(this.data.name);
+      return this.#api.collapse_message(this?.data?.name);
     }
 
     async uncollapse() {
-      return this.#api.uncollapse_message(this.data.name);
+      return this.#api.uncollapse_message(this?.data?.name);
+    }
+
+    async vote(dir) {
+      return this.#api.vote(this?.data?.name, dir);
     }
   };
 
@@ -135,41 +139,41 @@ module.exports = class API {
       let data = await this.#api.#get(this.#path, params);
       let index = 0;
       while (true) {
-        if (index === data.data.children.length) {
-          if (data.data.after === null) {
+        if (index === data?.data?.children?.length) {
+          if (data?.data?.after === null) {
             return;
           } else {
-            params.set("after", data.data.after);
+            params.set("after", data?.data?.after);
             data = await this.#api.#get(this.#path, params);
             index = 1;
           }
         }
-        yield new API.Item(this.#api, data.data.children[index++]);
+        yield new API.Item(this.#api, data?.data?.children[index++]);
       }
     }
   }
 
-  getInbox(options={}) {
+  messages_inbox(options={}) {
     return new API.Listing(this, "/message/inbox.json", options);
   }
 
-  getMessages(options={}) {
+  message_messages(options={}) {
     return new API.Listing(this, "/message/messages.json", options);
   }
 
-  getComments(options={}) {
+  message_comments(options={}) {
     return new API.Listing(this, "/message/comments.json", options);
   }
 
-  getSelfreply(options={}) {
+  message_selfreply(options={}) {
     return new API.Listing(this, "/message/selfreply.json", options);
   }
 
-  getUnread(options={}) {
+  message_unread(options={}) {
     return new API.Listing(this, "/message/unread.json", options);
   }
 
-  getMentions(options={}) {
+  message_mention(options={}) {
     return new API.Listing(this, "/message/mention.json", options);
   }
 
@@ -258,7 +262,7 @@ module.exports = class API {
     }));
   }
 
-  async submitSelf(sr, title, text, options={}) {
+  async submit(sr, title, body, kind="self", options={}) {
     return this.#post("/submit?" + new URLSearchParams({
       "resubmit": true,
       "redditWebClient": "desktop2x",
@@ -273,36 +277,18 @@ module.exports = class API {
       "title": title,
       "spoiler": false,
       "nsfw": false,
-      "kind": "self",
+      "kind": kind,
       "original_content": false,
       "post_to_twitter": false,
       "sendreplies": true,
-      "text": text,
-      "validate_on_submit": true,
-      ...options
-    }));
-  }
-
-  async submitLink(sr, title, url, options={}) {
-    return this.#post("/submit?" + new URLSearchParams({
-      "resubmit": true,
-      "redditWebClient": "desktop2x",
-      "app": "desktop2x-client-production",
-      "raw_json": 1,
-      "gilding_detail": 1
-    }), new URLSearchParams({
-      "sr": sr,
-      "submit_type": "subreddit",
-      "api_type": "json",
-      "show_error_list": true,
-      "title": title,
-      "spoiler": false,
-      "nsfw": false,
-      "kind": "link",
-      "original_content": false,
-      "post_to_twitter": false,
-      "sendreplies": true,
-      "url": url,
+      ...(() => {
+        switch (kind) {
+          case "link": return { "url": body }
+          default: return { "text": body }
+        }
+      })(),
+      "text": body,
+      "url": body,
       "validate_on_submit": true,
       ...options
     }));
@@ -318,6 +304,21 @@ module.exports = class API {
       "gilding_detail": 1
     }), new URLSearchParams({
       "id": id,
+      ...options
+    }));
+  }
+
+  async vote(id, dir, options={}) {
+    return this.#post("/del?" + new URLSearchParams({
+      "rtj": "only",
+      "emotes_as_images": true,
+      "redditWebClient": "desktop2x",
+      "app": "desktop2x-client-production",
+      "raw_json": 1,
+      "gilding_detail": 1
+    }), new URLSearchParams({
+      "id": id,
+      "dir": dir,
       ...options
     }));
   }
@@ -338,7 +339,7 @@ module.exports = class API {
       }
     });
     this.#setCookies(res0.headers.getSetCookie());
-    body.set("uh", JSON.parse(await res0.text()).data.modhash);
+    body.set("uh", JSON.parse(await res0.text())?.data?.modhash);
     let res = await fetch("https://www.reddit.com/api" + path, {
       method: "post",
       headers: {
@@ -358,7 +359,7 @@ module.exports = class API {
     return res[parser]();
   }
 
-  async read_message(id, options={}) {
+  async readMessage(id, options={}) {
     return this.#post2("/read_message?embedded=true", new URLSearchParams({
       "id": id,
       "executed": "read",
@@ -368,13 +369,13 @@ module.exports = class API {
     }));
   }
 
-  async read_all_messages(options={}) {
+  async readAllMessages(options={}) {
     return this.#post2("/read_all_messages?embedded=true", new URLSearchParams({
       ...options
     }), "text");
   }
 
-  async unread_message(id, options={}) {
+  async unreadMessage(id, options={}) {
     return this.#post2("/unread_message?embedded=true", new URLSearchParams({
       "id": id,
       "executed": "unread",
@@ -384,7 +385,7 @@ module.exports = class API {
     }));
   }
 
-  async collapse_message(id, options={}) {
+  async collapseMessage(id, options={}) {
     return this.#post2("/collapse_message?embedded=true", new URLSearchParams({
       "id": id,
       "executed": "collapse",
@@ -394,7 +395,7 @@ module.exports = class API {
     }));
   }
 
-  async uncollapse_message(id, options={}) {
+  async uncollapseMessage(id, options={}) {
     return this.#post2("/uncollapse_message?embedded=true",
       new URLSearchParams({
         "id": id,
