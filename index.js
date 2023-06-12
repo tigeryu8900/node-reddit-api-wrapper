@@ -103,19 +103,19 @@ module.exports = class API {
     }
 
     async read() {
-      return parent.read_message(this.data.name);
+      return this.#api.read_message(this.data.name);
     }
 
     async unread() {
-      return parent.unread_message(this.data.name);
+      return this.#api.unread_message(this.data.name);
     }
 
     async collapse() {
-      return parent.collapse_message(this.data.name);
+      return this.#api.collapse_message(this.data.name);
     }
 
     async uncollapse() {
-      return parent.uncollapse_message(this.data.name);
+      return this.#api.uncollapse_message(this.data.name);
     }
   };
 
