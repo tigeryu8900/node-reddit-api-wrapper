@@ -94,65 +94,83 @@ module.exports = class API {
     return res[parser]();
   }
 
-  #listing(path, options={}) {
-    let parent = this;
-    return {
-      async *[Symbol.asyncIterator]() {
-        let params = new URLSearchParams(options);
-        let data = await parent.#get(path, params);
-        let index = 0;
-        while (true) {
-          if (index === data.data.children.length) {
-            if (data.data.after === null) {
-              return;
-            } else {
-              params.set("after", data.data.after);
-              data = await parent.#get(path, params);
-              index = 0;
-            }
+  static Item = class Item {
+    #api;
+
+    constructor(api, data) {
+      this.#api = api;
+      Object.assign(this, data);
+    }
+
+    async read() {
+      return parent.read_message(this.data.name);
+    }
+
+    async unread() {
+      return parent.unread_message(this.data.name);
+    }
+
+    async collapse() {
+      return parent.collapse_message(this.data.name);
+    }
+
+    async uncollapse() {
+      return parent.uncollapse_message(this.data.name);
+    }
+  };
+
+  static Listing = class Listing {
+    #api;
+    #path;
+    #options;
+
+    constructor(api, path, options) {
+      this.#api = api;
+      this.#path = path;
+      this.#options = options;
+    }
+
+    async *[Symbol.asyncIterator]() {
+      let params = new URLSearchParams(this.#options);
+      let data = await this.#api.#get(this.#path, params);
+      let index = 0;
+      while (true) {
+        if (index === data.data.children.length) {
+          if (data.data.after === null) {
+            return;
+          } else {
+            params.set("after", data.data.after);
+            data = await this.#api.#get(this.#path, params);
+            index = 1;
           }
-          yield {
-            ...data.data.children[index++],
-            async read() {
-              return parent.read_message(this.data.name);
-            },
-            async unread() {
-              return parent.unread_message(this.data.name);
-            },
-            async collapse() {
-              return parent.collapse_message(this.data.name);
-            },
-            async uncollapse() {
-              return parent.uncollapse_message(this.data.name);
-            }
-          };
         }
+        yield new API.Item(this.#api, data.data.children[index++]);
       }
     }
   }
 
   getInbox(options={}) {
-    return this.#listing("/message/inbox.json", new URLSearchParams(options));
+    return new API.Listing(this, "/message/inbox.json", options);
   }
 
   getMessages(options={}) {
-    return this.#listing("/message/messages.json", new URLSearchParams(options));
+    return new API.Listing(this, "/message/messages.json", options);
   }
 
   getComments(options={}) {
-    return this.#listing("/message/comments.json", new URLSearchParams(options));
+    return new API.Listing(this, "/message/comments.json", options);
   }
 
   getSelfreply(options={}) {
-    return this.#listing("/message/selfreply.json", new URLSearchParams(options));
+    return new API.Listing(this, "/message/selfreply.json", options);
   }
 
   getUnread(options={}) {
-    return this.#listing("/message/unread.json", new URLSearchParams(options));
+    return new API.Listing(this, "/message/unread.json", options);
   }
 
   getMentions(options={}) {
-    return this.#listing("/message/mentions.json", new URLSearchParams(options));
+    return new API.Listing(this, "/message/mention.json", options);
   }
 
   async #post(path, body, ctx="/", parser="json") {
