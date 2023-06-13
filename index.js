@@ -281,12 +281,9 @@ module.exports = class API {
       "original_content": false,
       "post_to_twitter": false,
       "sendreplies": true,
-      ...(() => {
-        switch (kind) {
-          case "link": return { "url": body }
-          default: return { "text": body }
-        }
-      })(),
+      ...({
+        link: { "url": body }
+      })[kind] ?? { "text": body },
       "text": body,
       "url": body,
       "validate_on_submit": true,
