@@ -121,6 +121,10 @@ module.exports = class API {
     async vote(dir) {
       return this.#api.vote(this?.data?.name, dir);
     }
+
+    async reply(text, options={}) {
+      return this.#api.comment(this?.data?.name, text, options);
+    }
   };
 
   static Listing = class Listing {
