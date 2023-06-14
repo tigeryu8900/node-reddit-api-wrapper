@@ -125,6 +125,10 @@ module.exports = class API {
     async reply(text, options={}) {
       return this.#api.comment(this?.data?.name, text, options);
     }
+
+    async del() {
+      return this.#api.del(this?.data?.name);
+    }
   };
 
   static Listing = class Listing {
