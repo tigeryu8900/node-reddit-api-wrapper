@@ -22,5 +22,11 @@ module.exports = {
     } finally {
       await browser.close();
     }
-  }
+  },
+  T1: require("./t1"),
+  T2: require("./t2"),
+  T3: require("./t3"),
+  T4: require("./t4"),
+  T5: require("./t5"),
+  Listing: require("./listing")
 };
