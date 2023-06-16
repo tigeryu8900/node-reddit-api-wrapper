@@ -58,4 +58,16 @@ module.exports = class T1 {
   async del() {
     return this.#api.del(this.data.name);
   }
+
+  async approve() {
+    return this.#api.approve(this.data.name);
+  }
+
+  async sticky(sticky=true) {
+    return this.#api.sticky(this.data.name, sticky);
+  }
+
+  async distinguish(distunguish=true) {
+    return this.#api.distinguishComment(this.data.name, distunguish);
+  }
 }

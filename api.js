@@ -186,61 +186,61 @@ module.exports = class API {
     return parser ? res[parser]() : res.ok;
   }
 
-  // async gql(id, input, parser=null) {
-  //   let now = Date.now();
-  //   let res0 = await fetch("https://www.reddit.com", {
-  //     method: "get",
-  //     headers: {
-  //       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0",
-  //       "Accept": "text/html",
-  //       "Accept-Language": "en-US,en;q=0.5",
-  //       "Upgrade-Insecure-Requests": "1",
-  //       "Sec-Fetch-Dest": "document",
-  //       "Sec-Fetch-Mode": "navigate",
-  //       "Sec-Fetch-Site": "none",
-  //       "Sec-Fetch-User": "?1",
-  //       "Cookie": this.#prepareCookies()
-  //     }
-  //   });
-  //   this.#setCookies(res0.headers.getSetCookie());
-  //   let dom = new JSDOM(await res0.text()).window.document;
-  //   let user = JSON.parse(dom.querySelector('#data').textContent.slice(14,-1)).user;
-  //   let xRedditLoid = `${user.loid.loid}.${user.loid.version}.${user.loid.created}.${user.loid.blob}`;
-  //   this.#setCookie({
-  //     name: "loid",
-  //     value: xRedditLoid,
-  //     expires: now / 1000 + 34560000
-  //   });
-  //   this.#setCookie({
-  //     name: "session_tracker",
-  //     value: user.sessionTracker,
-  //     expires: now / 1000 + 34560000
-  //   });
-  //   let res = await fetch("https://gql.reddit.com", {
-  //     method: "post",
-  //     headers: {
-  //       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0",
-  //       "Accept": "*/*",
-  //       "Accept-Language": "en-US,en;q=0.5",
-  //       "Content-Type": "application/json",
-  //       "x-reddit-loid": xRedditLoid,
-  //       "x-reddit-session": user.sessionTracker,
-  //       "Sec-Fetch-Dest": "empty",
-  //       "Sec-Fetch-Mode": "cors",
-  //       "Sec-Fetch-Site": "same-site",
-  //       "Authorization": `Bearer ${user.session.accessToken}`,
-  //       "Cookie": this.#prepareCookies()
-  //     },
-  //     body: JSON.stringify({
-  //       id,
-  //       variables: {
-  //         input
-  //       }
-  //     })
-  //   });
-  //   this.#setCookies(res.headers.getSetCookie());
-  //   return parser ? res[parser]() : res.ok;
-  // }
+  async gql(id, input, parser=null) {
+    let now = Date.now();
+    let res0 = await fetch("https://www.reddit.com", {
+      method: "get",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0",
+        "Accept": "text/html",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Cookie": this.#prepareCookies()
+      }
+    });
+    this.#setCookies(res0.headers.getSetCookie());
+    let dom = new JSDOM(await res0.text()).window.document;
+    let user = JSON.parse(dom.querySelector('#data').textContent.slice(14,-1)).user;
+    let xRedditLoid = `${user.loid.loid}.${user.loid.version}.${user.loid.created}.${user.loid.blob}`;
+    this.#setCookie({
+      name: "loid",
+      value: xRedditLoid,
+      expires: now / 1000 + 34560000
+    });
+    this.#setCookie({
+      name: "session_tracker",
+      value: user.sessionTracker,
+      expires: now / 1000 + 34560000
+    });
+    let res = await fetch("https://gql.reddit.com", {
+      method: "post",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0",
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Content-Type": "application/json",
+        "x-reddit-loid": xRedditLoid,
+        "x-reddit-session": user.sessionTracker,
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "Authorization": `Bearer ${user.session.accessToken}`,
+        "Cookie": this.#prepareCookies()
+      },
+      body: JSON.stringify({
+        id,
+        variables: {
+          input
+        }
+      })
+    });
+    this.#setCookies(res.headers.getSetCookie());
+    return parser ? res[parser]() : res.ok;
+  }
 
   async messages_inbox(options={}) {
     return Listing.fromPath(this, "/message/inbox.json", options);
@@ -413,56 +413,38 @@ module.exports = class API {
     }, "json")?.json?.data?.things ?? [];
   }
 
-  // async acceptModeratorInvite(subreddit) {
-  //   return this.post(`/r/${subreddit}/accept_moderator_invite`, {});
-  // }
-  //
-  // async approve(id) {
-  //   return this.gql("660e0733e963", {id});
-  // }
-  //
-  // async stickyComment(commentId, sticky) {
-  //   return this.gql("236938d65d55", {commentId, sticky});
-  // }
-  //
-  // async undistinguishComment(commentId, sticky) {
-  //   return this.gql("e1f407c8ceba", {
-  //     commentId,
-  //     "distinguishState": "DISTINGUISHED",
-  //     "distinguishType": "MOD_DISTINGUISHED"
-  //   });
-  // }
-  //
-  // async stickyPost(postId, sticky, toProfile=false) {
-  //   return this.gql("13de9d1fcbe3", {postId, sticky, toProfile});
-  // }
-  //
-  // async undistinguishComment(commentId, sticky) {
-  //   return this.gql("e1f407c8ceba", {
-  //     commentId,
-  //     "distinguishState": "NONE",
-  //     "distinguishType": "NONE"
-  //   });
-  // }
-  //
-  // async distinguishPost(postId) {
-  //   return this.gql("e869489c84a4", {
-  //     postId,
-  //     "distinguishState": "DISTINGUISHED",
-  //     "distinguishType": "MOD_DISTINGUISHED"
-  //   });
-  // }
-  //
-  // async undistinguishPost(postId) {
-  //   return this.gql("e869489c84a4", {
-  //     "input": {
-  //       postId,
-  //       "distinguishState": "NONE",
-  //       "distinguishType": "NONE"
-  //     }
-  //   });
-  // }
-  //
+  async acceptModeratorInvite(subreddit) {
+    return this.post(`/r/${subreddit}/accept_moderator_invite`, {});
+  }
+
+  async approve(id) {
+    return this.gql("660e0733e963", {id});
+  }
+
+  async stickyComment(commentId, sticky=true) {
+    return this.gql("236938d65d55", {commentId, sticky});
+  }
+
+  async distinguishComment(commentId, distinguish=true) {
+    return this.gql("e1f407c8ceba", {
+      commentId,
+      "distinguishState": distinguish ? "DISTINGUISHED" : "NONE",
+      "distinguishType": distinguish ? "MOD_DISTINGUISHED" : "NONE"
+    });
+  }
+
+  async stickyPost(postId, sticky=true, toProfile=false) {
+    return this.gql("13de9d1fcbe3", {postId, sticky, toProfile});
+  }
+
+  async distinguishPost(postId, distinguish=true) {
+    return this.gql("e869489c84a4", {
+      postId,
+      "distinguishState": distinguish ? "DISTINGUISHED" : "NONE",
+      "distinguishType": distinguish ? "MOD_DISTINGUISHED" : "NONE"
+    });
+  }
+
   // async ignoreReports(id) {
   //   return this.post("/api/ignore_reports", {id});
   // }

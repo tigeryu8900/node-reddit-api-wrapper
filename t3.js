@@ -58,4 +58,12 @@ module.exports = class T3 {
   async del() {
     return this.#api.del(this.data.name);
   }
+
+  async sticky(sticky=true) {
+    return this.#api.sticky(this.data.name, sticky);
+  }
+
+  async distinguish(distunguish=true) {
+    return this.#api.distinguishPost(this.data.name, distunguish);
+  }
 }
