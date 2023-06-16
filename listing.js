@@ -42,6 +42,10 @@ module.exports = class Listing {
     }
   }
 
+  first() {
+    return require("./item").createItem(this.#api, this.#data.children[0]);
+  }
+
   async *[Symbol.asyncIterator]() {
     let params = new URLSearchParams(this.#options);
     let index = 0;
