@@ -63,7 +63,7 @@ module.exports = class T3 {
     return this.#api.sticky(this.data.name, sticky);
   }
 
-  async distinguish(distunguish=true) {
-    return this.#api.distinguishPost(this.data.name, distunguish);
+  async distinguish(distinguish=true) {
+    return this.#api.distinguishPost(this.data.name, distinguish);
   }
 }
