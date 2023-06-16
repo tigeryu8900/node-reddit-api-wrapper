@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "cookie-manager": "^0.0.19",
+    "html-escaper": "^3.0.3",
     "js-cookie": "^3.0.5",
     "jsdom": "^22.1.0",
     "puppeteer": "^20.5.0"

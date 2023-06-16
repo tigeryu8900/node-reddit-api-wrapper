@@ -1,5 +1,8 @@
 const assert = require("assert");
+const {unescape} = require("html-escaper");
+
 const Listing = require("./listing");
+
 module.exports = class T3 {
   #api;
   data;
@@ -12,7 +15,7 @@ module.exports = class T3 {
 
 
   body() {
-    return this.data.body();
+    return unescape(this.data.body());
   }
 
   isComplete() {
@@ -46,6 +49,14 @@ module.exports = class T3 {
 
   async reply(text, options = {}) {
     return this.#api.comment(this.data.name, text, options);
+  }
+
+  async edit(text, options={}) {
+    return this.#api.editusertext(this.data.name, text, options);
+  }
+
+  async append(text, options={}) {
+    return this.#api.editusertext(this.data.name, this.body() + text, options);
   }
 
   async replies() {
