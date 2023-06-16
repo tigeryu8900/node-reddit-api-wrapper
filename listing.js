@@ -36,19 +36,22 @@ module.exports = class Listing {
     }
   }
 
-  *[Symbol.iterator]() {
-    for (let child of this.#data.children) {
+  *[Symbol.iterator](index=0) {
+    for (let child of this.#data.children.slice(index)) {
       yield require("./item").createItem(this.#api, child);
     }
+  }
+
+  startAt(index, async=true) {
+    return async ? this[Symbol.asyncIterator](index) : this[Symbol.iterator](index);
   }
 
   first() {
     return require("./item").createItem(this.#api, this.#data.children[0]);
   }
 
-  async *[Symbol.asyncIterator]() {
+  async *[Symbol.asyncIterator](index=0) {
     let params = new URLSearchParams(this.#options);
-    let index = 0;
     while (true) {
       try {
         if (index === this.#data?.children?.length) {
