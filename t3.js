@@ -15,7 +15,7 @@ module.exports = class T3 {
 
 
   body() {
-    return unescape(this.data.body());
+    return unescape(this.data.body);
   }
 
   isComplete() {
